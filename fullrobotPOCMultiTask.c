@@ -34,95 +34,95 @@ int lastError = 0;
 bool lineFollowerActive = false;
 
 task ArmControl() {
-  while(true) {
-    // Increment arm position if button 5U is pressed
-    if (vexRT[Btn5U] && !btn5UPressedLastCycle) {
-      armMotorPosition += servoChangeRate;
-      btn5UPressedLastCycle = true;
-    } else if (!vexRT[Btn5U]) {
-      btn5UPressedLastCycle = false;
-    }
-    
-    // Decrement arm position if button 5D is pressed
-    if (vexRT[Btn5D] && !btn5DPressedLastCycle) {
-      armMotorPosition -= servoChangeRate;
-      btn5DPressedLastCycle = true;
-    } else if (!vexRT[Btn5D]) {
-      btn5DPressedLastCycle = false;
-    }
-    
-    // Limit the arm motor position to valid range of -127 to 127
-    armMotorPosition = armMotorPosition > 127 ? 127 : armMotorPosition < -127 ? -127 : armMotorPosition;
+	while(true) {
+		// Increment arm position if button 5U is pressed
+		if (vexRT[Btn5U] && !btn5UPressedLastCycle) {
+			armMotorPosition += servoChangeRate;
+			btn5UPressedLastCycle = true;
+			} else if (!vexRT[Btn5U]) {
+			btn5UPressedLastCycle = false;
+		}
 
-    // Write the position to the arm motor
-    motor[armMotor] = armMotorPosition;
+		// Decrement arm position if button 5D is pressed
+		if (vexRT[Btn5D] && !btn5DPressedLastCycle) {
+			armMotorPosition -= servoChangeRate;
+			btn5DPressedLastCycle = true;
+			} else if (!vexRT[Btn5D]) {
+			btn5DPressedLastCycle = false;
+		}
 
-    wait1Msec(controlLoopDelay);
-  }
+		// Limit the arm motor position to valid range of -127 to 127
+		armMotorPosition = armMotorPosition > 127 ? 127 : armMotorPosition < -127 ? -127 : armMotorPosition;
+
+		// Write the position to the arm motor
+		motor[armMotor] = armMotorPosition;
+
+		wait1Msec(controlLoopDelay);
+	}
 }
 
 task LineFollower() {
-  while(true) {
-    if(lineFollowerActive) {
-      // Line following logic goes here
-      error = SensorValue[lineFollower] - 2000;
-      integral = integral + error;
-      derivative = error - lastError;
-      lastError = error;
+	while(true) {
+		if(lineFollowerActive) {
+			// Line following logic goes here
+			error = SensorValue[lineFollower] - 2000;
+			integral = integral + error;
+			derivative = error - lastError;
+			lastError = error;
 
-      leftMotorSpeed = Kp * error + Ki * integral + Kd * derivative;
-      rightMotorSpeed = leftMotorSpeed;
+			leftMotorSpeed = Kp * error + Ki * integral + Kd * derivative;
+			rightMotorSpeed = leftMotorSpeed;
 
-      // If bump sensor is pressed, stop the motors
-      if(SensorValue[bumpSensor] == 1) {
-        leftMotorSpeed = 0;
-        rightMotorSpeed = 0;
-      }
-      
-      motor[leftMotor] = leftMotorSpeed;
-      motor[rightMotor] = rightMotorSpeed;
-    }
-    
-    wait1Msec(controlLoopDelay);
-  }
+			// If bump sensor is pressed, stop the motors
+			if(SensorValue[bumpSensor] == 1) {
+				leftMotorSpeed = 0;
+				rightMotorSpeed = 0;
+			}
+
+			motor[leftMotor] = leftMotorSpeed;
+			motor[rightMotor] = rightMotorSpeed;
+		}
+
+		wait1Msec(controlLoopDelay);
+	}
 }
 
 task main() {
-  startTask(ArmControl);
-  startTask(LineFollower);
-  
-  while(true) {
-    // Tank control logic goes here
-    if (vexRT[Btn6U] && !btn6UPressedLastCycle) {
-      lineFollowerActive = !lineFollowerActive;
-      btn6UPressedLastCycle = true;
-    } else if (!vexRT[Btn6U]) {
-      btn6UPressedLastCycle = false;
-    }
+	startTask(ArmControl);
+	startTask(LineFollower);
 
-    if(!lineFollowerActive) {
-      // Smooth acceleration for tank control
-      // Left motor
-      float leftJoystick = vexRT[Ch3];
-      float rightJoystick = vexRT[Ch2];
-      if(abs(leftJoystick - leftMotorSpeed) > accelerationStep) {
-        leftMotorSpeed += (leftJoystick > leftMotorSpeed) ? accelerationStep : -accelerationStep;
-      } else {
-        leftMotorSpeed = leftJoystick;
-      }
+	while(true) {
+		// Tank control logic goes here
+		if (vexRT[Btn6U] && !btn6UPressedLastCycle) {
+			lineFollowerActive = !lineFollowerActive;
+			btn6UPressedLastCycle = true;
+			} else if (!vexRT[Btn6U]) {
+			btn6UPressedLastCycle = false;
+		}
 
-      // Right motor
-      if(abs(rightJoystick - rightMotorSpeed) > accelerationStep) {
-        rightMotorSpeed += (rightJoystick > rightMotorSpeed) ? accelerationStep : -accelerationStep;
-      } else {
-        rightMotorSpeed = rightJoystick;
-      }
+		if(!lineFollowerActive) {
+			// Smooth acceleration for tank control
+			// Left motor
+			float leftJoystick = vexRT[Ch3];
+			float rightJoystick = vexRT[Ch2];
+			if(abs(leftJoystick - leftMotorSpeed) > accelerationStep) {
+				leftMotorSpeed += (leftJoystick > leftMotorSpeed) ? accelerationStep : -accelerationStep;
+				} else {
+				leftMotorSpeed = leftJoystick;
+			}
 
-      // Set motor speeds
-      motor[leftMotor] = leftMotorSpeed;
-      motor[rightMotor] = rightMotorSpeed;
-    }
+			// Right motor
+			if(abs(rightJoystick - rightMotorSpeed) > accelerationStep) {
+				rightMotorSpeed += (rightJoystick > rightMotorSpeed) ? accelerationStep : -accelerationStep;
+				} else {
+				rightMotorSpeed = rightJoystick;
+			}
 
-    wait1Msec(controlLoopDelay);
-  }
+			// Set motor speeds
+			motor[leftMotor] = leftMotorSpeed;
+			motor[rightMotor] = rightMotorSpeed;
+		}
+
+		wait1Msec(controlLoopDelay);
+	}
 }
