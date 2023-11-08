@@ -33,72 +33,72 @@ int lastError = 0;
 bool lineFollowerActive = false; // Tracks whether line follower mode is active
 
 task main() {
-  while(true) {
-    if (vexRT[Btn6U] && !btn6UPressedLastCycle) {
-      lineFollowerActive = !lineFollowerActive; // Toggle line follower mode
-      btn6UPressedLastCycle = true;
-    } else if (!vexRT[Btn6U]) {
-      btn6UPressedLastCycle = false;
-    }
+	while(true) {
+		if (vexRT[Btn6U] && !btn6UPressedLastCycle) {
+			lineFollowerActive = !lineFollowerActive; // Toggle line follower mode
+			btn6UPressedLastCycle = true;
+			} else if (!vexRT[Btn6U]) {
+			btn6UPressedLastCycle = false;
+		}
 
-    if (lineFollowerActive) {
-      // Read the line follower sensor
-      error = SensorValue[lineFollower] - 2000;
-      integral += error;
-      derivative = error - lastError;
-      lastError = error;
-      
-      // Compute the PID output for motor speed
-      leftMotorSpeed = Kp*error + Ki*integral + Kd*derivative;
-      rightMotorSpeed = leftMotorSpeed;
+		if (lineFollowerActive) {
+			// Read the line follower sensor
+			error = SensorValue[lineFollower] - 2000;
+			integral += error;
+			derivative = error - lastError;
+			lastError = error;
 
-      // Check for the bump sensor being pressed
-      if (SensorValue[bumpSensor] == 1) {
-        leftMotorSpeed = 0;
-        rightMotorSpeed = 0;
-      }
-    } else {
-      // Tank control
-      // Acceleration for left motor
-      if (abs(vexRT[Ch3] - leftMotorSpeed) > accelerationStep) {
-        leftMotorSpeed += vexRT[Ch3] > leftMotorSpeed ? accelerationStep : -accelerationStep;
-      } else {
-        leftMotorSpeed = vexRT[Ch3];
-      }
-      
-      // Acceleration for right motor
-      if (abs(vexRT[Ch2] - rightMotorSpeed) > accelerationStep) {
-        rightMotorSpeed += vexRT[Ch2] > rightMotorSpeed ? accelerationStep : -accelerationStep;
-      } else {
-        rightMotorSpeed = vexRT[Ch2];
-      }
-    }
-    
-    // Write the computed speeds to the motors
-    motor[leftMotor] = (int)leftMotorSpeed;
-    motor[rightMotor] = (int)rightMotorSpeed;
+			// Compute the PID output for motor speed
+			leftMotorSpeed = Kp*error + Ki*integral + Kd*derivative;
+			rightMotorSpeed = leftMotorSpeed;
 
-    // Servo control with debounce logic for arm
-    if (vexRT[Btn5U] && !btn5UPressedLastCycle) {
-      armMotorPosition += servoChangeRate;
-      btn5UPressedLastCycle = true;
-    } else if (!vexRT[Btn5U]) {
-      btn5UPressedLastCycle = false;
-    }
+			// Check for the bump sensor being pressed
+			if (SensorValue[bumpSensor] == 1) {
+				leftMotorSpeed = 0;
+				rightMotorSpeed = 0;
+			}
+			} else {
+			// Tank control
+			// Acceleration for left motor
+			if (abs(vexRT[Ch3] - leftMotorSpeed) > accelerationStep) {
+				leftMotorSpeed += vexRT[Ch3] > leftMotorSpeed ? accelerationStep : -accelerationStep;
+				} else {
+				leftMotorSpeed = vexRT[Ch3];
+			}
 
-    if (vexRT[Btn5D] && !btn5DPressedLastCycle) {
-      armMotorPosition -= servoChangeRate;
-      btn5DPressedLastCycle = true;
-    } else if (!vexRT[Btn5D]) {
-      btn5DPressedLastCycle = false;
-    }
-    
-    // Keep the arm motor position within the valid range
-    armMotorPosition = (armMotorPosition < -127) ? -127 : (armMotorPosition > 127 ? 127 : armMotorPosition);
-    
-    // Write the position to the arm motor
-    motor[armMotor] = armMotorPosition;
+			// Acceleration for right motor
+			if (abs(vexRT[Ch2] - rightMotorSpeed) > accelerationStep) {
+				rightMotorSpeed += vexRT[Ch2] > rightMotorSpeed ? accelerationStep : -accelerationStep;
+				} else {
+				rightMotorSpeed = vexRT[Ch2];
+			}
+		}
 
-    wait1Msec(controlLoopDelay); // Wait for the control loop delay
-  }
+		// Write the computed speeds to the motors
+		motor[leftMotor] = (int)leftMotorSpeed;
+		motor[rightMotor] = (int)rightMotorSpeed;
+
+		// Servo control with debounce logic for arm
+		if (vexRT[Btn5U] && !btn5UPressedLastCycle) {
+			armMotorPosition += servoChangeRate;
+			btn5UPressedLastCycle = true;
+			} else if (!vexRT[Btn5U]) {
+			btn5UPressedLastCycle = false;
+		}
+
+		if (vexRT[Btn5D] && !btn5DPressedLastCycle) {
+			armMotorPosition -= servoChangeRate;
+			btn5DPressedLastCycle = true;
+			} else if (!vexRT[Btn5D]) {
+			btn5DPressedLastCycle = false;
+		}
+
+		// Keep the arm motor position within the valid range
+		armMotorPosition = (armMotorPosition < -127) ? -127 : (armMotorPosition > 127 ? 127 : armMotorPosition);
+
+		// Write the position to the arm motor
+		motor[armMotor] = armMotorPosition;
+
+		wait1Msec(controlLoopDelay); // Wait for the control loop delay
+	}
 }
