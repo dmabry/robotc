@@ -43,13 +43,13 @@ task main()
       // counter-steer right for 200 msec in search for line:
       motor[leftMotor]  = 0;
       motor[rightMotor] = 63;
-      wait1Msec(200)
+      wait1Msec(200);
       // counter-steer left for 200 msec in search for line:
       if (SensorValue(lineTracker) > threshold)
       {
       	motor[leftMotor] = 63;
       	motor[rightMotor] = 0;
-      	wait1Msec(200)
+      	wait1Msec(200);
       }
     }
   }
