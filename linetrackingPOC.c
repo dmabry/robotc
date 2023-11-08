@@ -19,39 +19,39 @@
 //+++++++++++++++++++++++++++++++++++++++++++++| MAIN |+++++++++++++++++++++++++++++++++++++++++++++++
 task main()
 {
-  wait1Msec(5000);          // wait 5 seconds before starting.
+	wait1Msec(5000);          // wait 5 seconds before starting.
 
-  int threshold = 505;      // found by taking a reading on both DARK and LIGHT surfaces, adding them together, then dividing by 2.
+	int threshold = 505;      // found by taking a reading on both DARK and LIGHT surfaces, adding them together, then dividing by 2.
 
-  // move forward for 500 msec then check steering
-  motor[leftMotor]  = 63;
-  motor[rightMotor] = 63;
-  wait1Msec(500);
-  // start line following
-  while(true)
-  {
-    // sensor sees light:
-    if(SensorValue(lineTracker) < threshold)
-    {
-      // proceed forward:
-      motor[leftMotor]  = 63;
-      motor[rightMotor] = 63;
-    }
-    // sensor sees dark:
-    else
-    {
-      // counter-steer right for 200 msec in search for line:
-      motor[leftMotor]  = 0;
-      motor[rightMotor] = 63;
-      wait1Msec(200);
-      // counter-steer left for 200 msec in search for line:
-      if (SensorValue(lineTracker) > threshold)
-      {
-      	motor[leftMotor] = 63;
-      	motor[rightMotor] = 0;
-      	wait1Msec(200);
-      }
-    }
-  }
+	// move forward for 500 msec then check steering
+	motor[leftMotor]  = 63;
+	motor[rightMotor] = 63;
+	wait1Msec(500);
+	// start line following
+	while(true)
+	{
+		// sensor sees light:
+		if(SensorValue(lineTracker) < threshold)
+		{
+			// proceed forward:
+			motor[leftMotor]  = 63;
+			motor[rightMotor] = 63;
+		}
+		// sensor sees dark:
+		else
+		{
+			// counter-steer right for 200 msec in search for line:
+			motor[leftMotor]  = 0;
+			motor[rightMotor] = 63;
+			wait1Msec(200);
+			// counter-steer left for 200 msec in search for line:
+			if (SensorValue(lineTracker) > threshold)
+			{
+				motor[leftMotor] = 63;
+				motor[rightMotor] = 0;
+				wait1Msec(200);
+			}
+		}
+	}
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
