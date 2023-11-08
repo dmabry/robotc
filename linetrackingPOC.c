@@ -19,7 +19,7 @@
 //+++++++++++++++++++++++++++++++++++++++++++++| MAIN |+++++++++++++++++++++++++++++++++++++++++++++++
 task main()
 {
-  wait1Msec(2000);          // wait 5 seconds before starting.
+  wait1Msec(5000);          // wait 5 seconds before starting.
 
   int threshold = 505;      // found by taking a reading on both DARK and LIGHT surfaces, adding them together, then dividing by 2.
 
