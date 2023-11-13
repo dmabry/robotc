@@ -7,28 +7,35 @@
 
 task main()
 {
-	wait1Msec(1000);          // wait 1 seconds before starting.
+  // Wait 1 second before starting
+  wait1Msec(1000);
 
-	int threshold = 2400;// found by taking a reading on both DARK and LIGHT surfaces, adding them together, then dividing by 2.
+  // This threshold will have to be adjusted depending on the environment and
+  // the line being tracked.  You may also have to invert the comparisons if
+  // you are tracking a "dark" line instead of "light" line.
+  int threshold = 2400;
 
-	// start line following
-	while(true)
-	{
-    // RIGHT sensor trigger:
+  // loopDelay controls how often the robot will check the sensor and align.
+  int loopDelay = 25;
+
+  // start line following
+  while(true)
+  {
+    // Right sensor trigger:
     if(SensorValue(lineTrackerRight) > threshold)
     {
       // counter-steer right:
       motor[leftMotor]  = 63;
       motor[rightMotor] = 0;
     }
-    // CENTER sensor trigger:
+    // Center sensor trigger:
     if(SensorValue(lineTrackerCenter) > threshold)
     {
       // go straight
       motor[leftMotor]  = 63;
       motor[rightMotor] = 63;
     }
-    // LEFT sensor trigger:
+    // Left sensor trigger:
     if(SensorValue(lineTrackerLeft) > threshold)
     {
       // counter-steer left:
@@ -36,6 +43,6 @@ task main()
       motor[rightMotor] = 63;
     }
   }
-	//wait1Msec(10);
+  wait1Msec(loopDelay);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
